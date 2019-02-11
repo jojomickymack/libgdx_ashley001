@@ -19,17 +19,19 @@ class UserControlledSystem : IteratingSystem(Family.all(PhysicsComponent::class.
     public override fun processEntity(entity: Entity, deltaTime: Float) {
         val physics = pm.get(entity)
 
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            physics.vel.x = -physics.topSpeed
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            physics.vel.x = physics.topSpeed
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            physics.vel.y = physics.topSpeed
-        }
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            physics.vel.y = -physics.topSpeed
+        with(physics) {
+            if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
+                vel.x = -topSpeed
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
+                vel.x = topSpeed
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
+                vel.y = topSpeed
+            }
+            if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
+                vel.y = -topSpeed
+            }
         }
     }
 }

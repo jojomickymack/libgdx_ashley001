@@ -12,7 +12,7 @@ import com.badlogic.gdx.math.Rectangle
 import com.badlogic.gdx.math.Vector2
 import com.badlogic.gdx.utils.Array
 import com.badlogic.gdx.utils.Pool
-import com.central.MyGameObj
+import com.central.views.MyGameObj
 import com.central.components.AiControlledComponent
 import com.central.components.PhysicsComponent
 import com.central.components.UserControlledComponent
@@ -27,14 +27,12 @@ class MapControllerSystem : EntitySystem() {
 
     private val tiles = Array<Rectangle>()
 
-    private var player: ImmutableArray<Entity> = ImmutableArray(Array<Entity>())
-    private var ai: ImmutableArray<Entity> = ImmutableArray(Array<Entity>())
+    private var player = ImmutableArray(Array<Entity>())
+    private var ai = ImmutableArray(Array<Entity>())
 
     // create a pool of rectangle objects for collision detection
     private val rectPool = object : Pool<Rectangle>() {
-        override fun newObject(): Rectangle {
-            return Rectangle()
-        }
+        override fun newObject(): Rectangle = Rectangle()
     }
 
     init {
@@ -65,39 +63,24 @@ class MapControllerSystem : EntitySystem() {
     }
 
     fun getHorizNeighbourTiles(velocity: Vector2, rect: Rectangle, tileLayer: TiledMapTileLayer): Array<Rectangle> {
-        val startX: Int
-        val startY: Int
-        val endX: Int
-        val endY: Int
+        val startY = rect.y.toInt()
+        val endY = (rect.y + rect.height).toInt()
+
         // if the sprite is moving right, get the tiles to its right side
-        if (velocity.x > 0) {
-            endX = (rect.x + rect.width).toInt()
-            startX = endX
-        } else { // if the sprite is moving left, get the tiles to its left side
-            endX = rect.x.toInt()
-            startX = endX
-        }
-        startY = rect.y.toInt()
-        endY = (rect.y + rect.height).toInt()
+        // if the sprite is moving left, get the tiles to its left side
+        val startX = if (velocity.x > 0) (rect.x + rect.width).toInt() else rect.x.toInt()
+        val endX = startX
 
         return getTiles(startX, startY, endX, endY, tileLayer)
     }
 
     fun getVertNeighbourTiles(velocity: Vector2, rect: Rectangle, tileLayer: TiledMapTileLayer): Array<Rectangle> {
-        val startX: Int
-        val startY: Int
-        val endX: Int
-        val endY: Int
+        val startX = rect.x.toInt()
+        val endX = (rect.x + rect.width).toInt()
         // if sprite is moving up, get the tiles above it
-        if (velocity.y > 0) {
-            endY = (rect.y + rect.height).toInt()
-            startY = endY
-        } else { // if sprite is moving down, get the tiles below it
-            endY = rect.y.toInt()
-            startY = endY
-        }
-        startX = rect.x.toInt()
-        endX = (rect.x + rect.width).toInt()
+        // if sprite is moving down, get the tiles below it
+        val startY = if (velocity.y > 0) (rect.y + rect.height).toInt() else rect.y.toInt()
+        val endY = startY
 
         return getTiles(startX, startY, endX, endY, tileLayer)
     }
@@ -109,33 +92,35 @@ class MapControllerSystem : EntitySystem() {
 
             val testRect = Rectangle()
 
-            testRect.set(physics.rect.x * MyGameObj.unitScale, physics.rect.y * MyGameObj.unitScale, physics.w * MyGameObj.unitScale, physics.h * MyGameObj.unitScale)
+            with(physics) {
+                testRect.set(rect.x * MyGameObj.unitScale, rect.y * MyGameObj.unitScale, w * MyGameObj.unitScale, h * MyGameObj.unitScale)
 
-            var myTiles = getVertNeighbourTiles(physics.vel, testRect, this.solid)
+                var myTiles = getVertNeighbourTiles(vel, testRect, solid)
 
-            myTiles.forEach {
-                if (testRect.overlaps(it)) {
-                    if (physics.vel.y > 0) {
-                        physics.pos.y = it.y / MyGameObj.unitScale - testRect.height / MyGameObj.unitScale
-                        physics.rect.y = it.y - physics.rect.height
-                    } else if (physics.vel.y < 0) {
-                        physics.pos.y = it.y / MyGameObj.unitScale + it.height / MyGameObj.unitScale
-                        physics.rect.y = it.y + it.height
+                myTiles.forEach {
+                    if (testRect.overlaps(it)) {
+                        if (vel.y > 0) {
+                            pos.y = it.y / MyGameObj.unitScale - testRect.height / MyGameObj.unitScale
+                            rect.y = it.y - rect.height
+                        } else if (vel.y < 0) {
+                            pos.y = it.y / MyGameObj.unitScale + it.height / MyGameObj.unitScale
+                            rect.y = it.y + it.height
+                        }
+                        vel.y = 0f
+                        return@forEach
                     }
-                    physics.vel.y = 0f
-                    return@forEach
                 }
-            }
 
-            testRect.set(physics.pos.x * MyGameObj.unitScale, physics.pos.y * MyGameObj.unitScale, physics.w * MyGameObj.unitScale, physics.h * MyGameObj.unitScale)
+                testRect.set(pos.x * MyGameObj.unitScale, pos.y * MyGameObj.unitScale, w * MyGameObj.unitScale, h * MyGameObj.unitScale)
 
-            myTiles = getHorizNeighbourTiles(physics.vel, testRect, this.solid)
+                myTiles = getHorizNeighbourTiles(vel, testRect, solid)
 
-            myTiles.forEach {
-                if (testRect.overlaps(it)) {
-                    physics.vel.x = 0f
-                    physics.rect.x -= physics.vel.x * MyGameObj.unitScale
-                    return@forEach
+                myTiles.forEach {
+                    if (testRect.overlaps(it)) {
+                        vel.x = 0f
+                        rect.x -= vel.x * MyGameObj.unitScale
+                        return@forEach
+                    }
                 }
             }
         }
@@ -145,33 +130,35 @@ class MapControllerSystem : EntitySystem() {
 
             val testRect = Rectangle()
 
-            testRect.set(physics.rect.x * MyGameObj.unitScale, physics.rect.y * MyGameObj.unitScale, physics.w * MyGameObj.unitScale, physics.h * MyGameObj.unitScale)
+            with(physics) {
+                testRect.set(rect.x * MyGameObj.unitScale, rect.y * MyGameObj.unitScale, w * MyGameObj.unitScale, h * MyGameObj.unitScale)
 
-            var myTiles = getVertNeighbourTiles(physics.vel, testRect, this.solid)
+                var myTiles = getVertNeighbourTiles(vel, testRect, solid)
 
-            myTiles.forEach {
-                if (testRect.overlaps(it)) {
-                    if (physics.vel.y > 0) {
-                        physics.pos.y = it.y / MyGameObj.unitScale - testRect.height / MyGameObj.unitScale
-                        physics.rect.y = it.y - physics.rect.height
-                    } else if (physics.vel.y < 0) {
-                        physics.pos.y = it.y / MyGameObj.unitScale + it.height / MyGameObj.unitScale
-                        physics.rect.y = it.y + it.height
+                myTiles.forEach {
+                    if (testRect.overlaps(it)) {
+                        if (vel.y > 0) {
+                            pos.y = it.y / MyGameObj.unitScale - testRect.height / MyGameObj.unitScale
+                            rect.y = it.y - rect.height
+                        } else if (vel.y < 0) {
+                            pos.y = it.y / MyGameObj.unitScale + it.height / MyGameObj.unitScale
+                            rect.y = it.y + it.height
+                        }
+                        vel.y = 0f
+                        return@forEach
                     }
-                    physics.vel.y = 0f
-                    return@forEach
                 }
-            }
 
-            testRect.set(physics.pos.x * MyGameObj.unitScale, physics.pos.y * MyGameObj.unitScale, physics.w * MyGameObj.unitScale, physics.h * MyGameObj.unitScale)
+                testRect.set(pos.x * MyGameObj.unitScale, pos.y * MyGameObj.unitScale, w * MyGameObj.unitScale, h * MyGameObj.unitScale)
 
-            myTiles = getHorizNeighbourTiles(physics.vel, testRect, this.solid)
+                myTiles = getHorizNeighbourTiles(vel, testRect, solid)
 
-            myTiles.forEach {
-                if (testRect.overlaps(it)) {
-                    physics.direction *= -1
-                    physics.rect.x -= physics.vel.x * MyGameObj.unitScale
-                    return@forEach
+                myTiles.forEach {
+                    if (testRect.overlaps(it)) {
+                        direction *= -1
+                        rect.x -= vel.x * MyGameObj.unitScale
+                        return@forEach
+                    }
                 }
             }
         }

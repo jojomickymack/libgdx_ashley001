@@ -6,9 +6,8 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.EntitySystem
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.utils.ImmutableArray
-import com.badlogic.gdx.graphics.g2d.SpriteBatch
 import com.badlogic.gdx.utils.Array
-import com.central.MyGameObj
+import com.central.views.MyGameObj
 import com.central.components.TextureComponent
 import com.central.components.PhysicsComponent
 
@@ -39,12 +38,14 @@ class RenderSystem : EntitySystem() {
             val physics = mm.get(it)
             val texture = tm.get(it)
 
-            MyGameObj.stg.batch.draw(texture.region,
-                    physics.pos.x * MyGameObj.unitScale, physics.pos.y * MyGameObj.unitScale,
-                    physics.w * MyGameObj.unitScale, physics.h * MyGameObj.unitScale,
-                    physics.w * MyGameObj.unitScale, physics.h * MyGameObj.unitScale,
-                    physics.scl.x, physics.scl.y,
-                    physics.rot)
+            with(physics) {
+                MyGameObj.stg.batch.draw(texture.region,
+                        pos.x * MyGameObj.unitScale, pos.y * MyGameObj.unitScale,
+                        w * MyGameObj.unitScale, h * MyGameObj.unitScale,
+                        w * MyGameObj.unitScale, h * MyGameObj.unitScale,
+                        scl.x, scl.y,
+                        rot)
+            }
         }
 
         MyGameObj.stg.batch.end()

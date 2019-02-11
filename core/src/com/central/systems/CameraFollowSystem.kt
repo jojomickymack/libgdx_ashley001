@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
-import com.central.MyGameObj
+import com.central.views.MyGameObj
 import com.central.components.CameraFollowComponent
 import com.central.components.PhysicsComponent
 

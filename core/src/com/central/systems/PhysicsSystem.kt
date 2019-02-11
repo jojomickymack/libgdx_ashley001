@@ -4,8 +4,7 @@ import com.badlogic.ashley.core.ComponentMapper
 import com.badlogic.ashley.core.Entity
 import com.badlogic.ashley.core.Family
 import com.badlogic.ashley.systems.IteratingSystem
-import com.badlogic.gdx.math.Vector2
-import com.central.MyGameObj
+import com.central.views.MyGameObj
 import com.central.components.PhysicsComponent
 import java.math.RoundingMode
 
@@ -16,17 +15,19 @@ class PhysicsSystem : IteratingSystem(Family.all(PhysicsComponent::class.java).g
     public override fun processEntity(entity: Entity, deltaTime: Float) {
         val physics = pm.get(entity)
 
-        physics.vel.y -= MyGameObj.grav
+        with(physics) {
+            vel.y -= MyGameObj.grav
 
-        physics.vel.x *= dampening
-        if (Math.abs(physics.vel.x) < 5) physics.vel.x = 0f
+            vel.x *= dampening
+            if (Math.abs(vel.x) < 5) vel.x = 0f
 
-        physics.pos.x += physics.vel.x * deltaTime
-        physics.pos.y += physics.vel.y * deltaTime
+            pos.x += vel.x * deltaTime
+            pos.y += vel.y * deltaTime
 
-        physics.pos.x = physics.pos.x.toBigDecimal().setScale(2, RoundingMode.DOWN).toFloat()
-        physics.pos.y = physics.pos.y.toBigDecimal().setScale(2, RoundingMode.DOWN).toFloat()
+            pos.x = pos.x.toBigDecimal().setScale(2, RoundingMode.DOWN).toFloat()
+            pos.y = pos.y.toBigDecimal().setScale(2, RoundingMode.DOWN).toFloat()
 
-        physics.rect.set(physics.pos.x, physics.pos.y, physics.w, physics.h)
+            rect.set(pos.x, pos.y, w, h)
+        }
     }
 }
