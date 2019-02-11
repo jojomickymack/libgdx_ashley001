@@ -9,4 +9,4 @@ The engine assists in exposing certain types of entities to the systems that int
 	player = engine.getEntitiesFor(Family.all(PhysicsComponent::class.java, UserControlledComponent::class.java).get())
 	ai = engine.getEntitiesFor(Family.all(PhysicsComponent::class.java, AiControlledComponent::class.java).get())
 
-For more info about the justification for using this programming pattern, check my write-up on [my website](http://reverie.fun/blog/ashley-ecs).
+For more info about the justification for using this programming pattern, check my write-up on [my website](https://jojomickymack.gitlab.io/reverie/post/ashley_ecs/).
