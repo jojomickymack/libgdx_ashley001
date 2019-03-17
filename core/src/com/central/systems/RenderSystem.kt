@@ -27,8 +27,8 @@ class RenderSystem : EntitySystem() {
 
     override fun update(deltaTime: Float) {
         val map = engine.getSystem(MapControllerSystem::class.java)
-        map.mr.setView(MyGameObj.cam)
-        map.mr.render()
+        MyGameObj.mr.setView(MyGameObj.cam)
+        MyGameObj.mr.render()
 
         MyGameObj.stg.batch.projectionMatrix = MyGameObj.cam.combined
 

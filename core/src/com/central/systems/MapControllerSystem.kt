@@ -19,11 +19,8 @@ import com.central.components.UserControlledComponent
 
 class MapControllerSystem : EntitySystem() {
 
-    val map = TmxMapLoader().load("map/map.tmx")
-    val mr = OrthogonalTiledMapRenderer(map, MyGameObj.unitScale)
-
-    val solid = map.layers.get("solid") as TiledMapTileLayer
-    val background = map.layers.get("background") as TiledMapTileLayer
+    val solid = MyGameObj.map.layers.get("solid") as TiledMapTileLayer
+    val background = MyGameObj.map.layers.get("background") as TiledMapTileLayer
 
     private val tiles = Array<Rectangle>()
 

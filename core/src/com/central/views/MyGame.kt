@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Entity
 import com.badlogic.gdx.Gdx
 import com.badlogic.gdx.graphics.GL20
 import ktx.app.KtxScreen
-import com.badlogic.gdx.graphics.Texture
 import com.badlogic.gdx.graphics.g2d.TextureRegion
 import com.central.App
 import com.central.components.*
@@ -44,7 +43,7 @@ class MyGame(val application: App) : KtxScreen {
             addSystem(cameraFollowSystem)
         }
 
-        alexTex.region = TextureRegion(Texture(Gdx.files.internal("alex.png")))
+        alexTex.region = TextureRegion(MyGameObj.alexTex)
 
         with(alexPhys) {
             w = 30f
@@ -59,7 +58,7 @@ class MyGame(val application: App) : KtxScreen {
             add(cameraFollow)
         }
 
-        enemyTex.region = TextureRegion(Texture(Gdx.files.internal("enemy.png")))
+        enemyTex.region = TextureRegion(MyGameObj.enemyTex)
 
         with(enemyPhys) {
             w = 40f
@@ -90,5 +89,11 @@ class MyGame(val application: App) : KtxScreen {
 
     override fun resize(width: Int, height: Int) {
 
+    }
+
+    override fun dispose() {
+        MyGameObj.dispose()
+        println("all disposable memory freed")
+        super.dispose()
     }
 }
